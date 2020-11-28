@@ -4,7 +4,6 @@
             <div class="card-body">
                 <h4 class="card-title">{{vr.recipe.name}}</h4>
                 <h5 class="card-subtitle"><strong>{{vr.recipe.amount}}x</strong> in <strong>{{vr.recipe.time}}</strong> seconds</h5>
-                
 
                 <div v-if="vr.recipe.input.length > 0" class="collapsible">
                     <input :id="'collapsible' + vr.recipe.id" type="checkbox" name="collapsible">
@@ -16,7 +15,8 @@
                     </div>
                 </div>
 
-                <button class="btn-small btn-secondary" style="position: absolute; top: 0; right: 0;" @click="changeMode(vr)">Edit</button>
+                <button v-if="isRecipeDeletable(vr)" class="btn-small btn-secondary" style="position: absolute; top: 2px; right: 50px;" @click="deleteEntry(vr)">Delete</button>
+                <button class="btn-small btn-secondary" style="position: absolute; top: 2px; right: 2px;" @click="changeMode(vr)">Edit</button>
             </div>
         </div>
 
@@ -56,6 +56,12 @@ export default {
         },
         recipeEditCanceled(vr) {
             this.changeMode(vr);
+        },
+        isRecipeDeletable(vr) {
+            return this.$data.repository.isRecipeDeletable(vr.recipe);
+        },
+        deleteEntry(vr) {
+            this.$data.repository.deleteRecipe(vr.recipe)
         }
     },
     computed: {

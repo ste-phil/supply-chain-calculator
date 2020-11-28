@@ -123,8 +123,21 @@ const repository = {
     recipeNameExists(name) {
         return this.state.recipes.filter(x => x.name == name).length ? true : false;
     },
+    isRecipeDeletable(recipeToCheck) {
+        for(let i = 0; i < this.state.recipes.length; i++) {
+            let recipe = this.state.recipes[i];
+            for(let j = 0; j < recipe.input.length; j++) {
+                let inputRecipeId = recipe.input[j].recipeId;
+                if (inputRecipeId == recipeToCheck.id) return false;
+            }
+        }
+
+        return true;
+    },
     deleteRecipe(recipe) {
-        this.state.recipes.splice(this.input.indexOf(recipe), 1)
+        this.state.recipes.splice(this.state.recipes.indexOf(recipe), 1);
+
+        this.saveRecipes();
     },
     addRecipeMock() {
         this.state.recipes.push({
