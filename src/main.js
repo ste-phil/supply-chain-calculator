@@ -1,43 +1,50 @@
 import { createApp, reactive } from 'vue'
 import App from './App.vue'
+import ClipboardJS from 'clipboard'
+
+new ClipboardJS('.to-clipboard', {
+    text: function() {
+        return JSON.stringify(repository.getRecipes())
+    }
+});
 
 let defaultRecipes = [
     {
-        id: 1,
+        id: 6,
         name: "Iron Ore", 
         time: 1,
         amount: 1,
         input: []
     },{
-        id: 2,
+        id: 5,
         name: "Iron Plate", 
         time: 3.2,
         amount: 1,
-        input: [{recipeId: 1, amount: 1}]
+        input: [{recipeId: 6, amount: 1}]
     },{
-        id: 3,
+        id: 4,
         name: "Copper ore", 
         time: 1,
         amount: 1,
         input: []
     },{
-        id: 4,
+        id: 3,
         name: "Copper Plate", 
         time: 3.2,
         amount: 1,
-        input: [{recipeId: 3, amount: 1}]
+        input: [{recipeId: 4, amount: 1}]
     },{
-        id: 5,
+        id: 2,
         name: "Gears", 
         time: 0.5,
         amount: 1,
-        input: [{recipeId: 2, amount: 2}]
+        input: [{recipeId: 5, amount: 2}]
     },{
-        id: 6,
+        id: 1,
         name: "Red Science", 
         time: 5,
         amount: 1,
-        input: [{recipeId: 4, amount: 1}, {recipeId: 5, amount: 1}]
+        input: [{recipeId: 2, amount: 1}, {recipeId: 3, amount: 1}]
     }
 ];
 
@@ -81,10 +88,10 @@ const repository = {
         this.saveRecipes();
     },
     addRecipe(name, time, amount, input) {
-        //if (!!this.findRecipeByName(name)) return;
+        if (this.recipeNameExists(name)) return;
 
         this.state.recipes.splice(0, 0, {
-            id: this.state.recipes[this.state.recipes.length - 1].id + 1, 
+            id: this.state.recipes[0].id + 1, 
             name, 
             time, 
             amount, 
@@ -101,6 +108,9 @@ const repository = {
     },
     findRecipeByName(name) {
         return this.state.recipes.filter(x => x.name == name)[0];
+    },
+    recipeNameExists(name) {
+        return this.state.recipes.filter(x => x.name == name).length ? true : false;
     },
     addRecipeMock() {
         this.state.recipes.push({

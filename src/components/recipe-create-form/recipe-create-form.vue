@@ -17,7 +17,7 @@
         <hr >
         <label class="border">Ingredients</label>
         <div style="padding: 10px; background-color:var(--white-dark-light-80)">
-            <h6 v-for="ins in input" style="margin: 0.15rem" :key="ins"><strong>{{ins.amount}}x</strong> {{ins.name}}</h6>
+            <ingredient-list-item v-for="ingredient in input" :key="ingredient" :ingredient="ingredient" @ingredient-amount-modify="modifiyIngredientAmount(ingredient, $event)"></ingredient-list-item>
         </div>
       </div>
       <br/>
@@ -29,10 +29,15 @@
 </template>
 
 <script>
+import IngredientListItem from './ingredient-list-item.vue';
+
 export default {
-  name: "create-recipe-form",
+  name: "recipe-create-form",
   emits: ["update:visible"],
   props: ["visible"],
+  components: {
+    "ingredient-list-item" : IngredientListItem
+  },
   data() {
     return {
       name: "",
@@ -84,6 +89,10 @@ export default {
 
       //Clear current selection
       this.selectedInput = "";
+    },
+    modifiyIngredientAmount(ing, amount) {
+      if (ing.amount + amount > 0) ing.amount += amount;
+      else this.input.splice(this.input.indexOf(ing), 1)
     }
   },
 };

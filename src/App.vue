@@ -19,7 +19,7 @@
 
 <script>
 import ChainResolver from './components/chain-resolver.vue'
-import CreateRecipeForm from './components/create-recipe-form.vue'
+import CreateRecipeForm from './components/recipe-create-form/recipe-create-form.vue'
 import ButtonImg from './components/button-img.vue'
 import RecipeList from './components/recipe-list.vue'
 
