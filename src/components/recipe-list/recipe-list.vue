@@ -20,7 +20,7 @@
             </div>
         </div>
 
-        <recipe-create-form v-if="vr.editMode"></recipe-create-form>
+        <recipe-edit-form v-if="vr.editMode" :recipe="vr.recipe" @save="recipeEditSaved($event, vr)"  @cancel="recipeEditCanceled(vr)"></recipe-edit-form>
     </div>
 
     
@@ -28,13 +28,13 @@
 
 <script>
 import { reactive } from 'vue';
-import RecipeCreateForm from './recipe-create-form/recipe-create-form.vue';
+import RecipeEditForm from './recipe-edit-form.vue';
 
 export default {
     name: "recipe-list",
     props: [],
     components: {
-        "recipe-create-form": RecipeCreateForm
+        "recipe-edit-form": RecipeEditForm
     },
     methods: {
         findRecipeName(recipeId) {
@@ -42,6 +42,20 @@ export default {
         },
         changeMode(vr) {
             vr.editMode = !vr.editMode;
+        },
+        recipeEditSaved(editedRecipe, vr) {
+            this.$data.repository.updateRecipe(
+                vr.recipe,
+                editedRecipe.name,
+                editedRecipe.time,
+                editedRecipe.amount,
+                editedRecipe.input
+            );
+
+            this.changeMode(vr);
+        },
+        recipeEditCanceled(vr) {
+            this.changeMode(vr);
         }
     },
     computed: {

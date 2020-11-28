@@ -1,16 +1,16 @@
 <template>
-  <div v-if="visible" class="card" style="width: 100%; margin:10px 0 10px 0;">
+  <div class="card" style="width: 100%; margin:10px 0 10px 0;">
     <div class="card-body">
       <input v-model="name" style="margin: 0 0 5px 0; width: 100%;" placeholder="Name"/>
-      <input v-model="time" style="margin: 0 0 5px 0; width: 100%;" placeholder="Time" type="number"/>
+      <input v-model="time" style="margin: 0 0 5px 0; width: 100%;" placeholder="Time (seconds)" type="number"/>
       <input v-model="amount" style="margin: 0 0 5px 0; width: 100%;" placeholder="Amount" type="number"/>
       
       <div class="clearfix">
-      <input v-model="selectedInput" placeholder="Select Inputs" list="recipes-create" style="margin: 0 0 5px 0; width: calc(100% - 35px); float:left;">
-      <button @click="addSelectedInput" class="btn-small" style="float:left; font-size:19px; ">+</button>
-      <datalist id="recipes-create" >
-          <option v-for="recipe in repository.getRecipes()" :key="recipe" :value="recipe.name" :data-id="recipe.id"></option>
-      </datalist>
+        <input v-model="selectedInput" placeholder="Select Inputs" list="recipes-create" style="margin: 0 0 5px 0; width: calc(100% - 35px); float:left;">
+        <button @click="addSelectedInput" class="btn-small" style="float:left; font-size:19px; ">+</button>
+        <datalist id="recipes-create" >
+            <option v-for="recipe in repository.getRecipes()" :key="recipe" :value="recipe.name" :data-id="recipe.id"></option>
+        </datalist>
       </div>
 
       <div v-if="input.length > 0" style="float:none;width:100%;">
@@ -23,7 +23,7 @@
       <br/>
 
       <button @click="cancel()" style="width: 50%;" class="btn-danger">Cancel</button>
-      <button @click="submit()" style="width: 50%;" class="btn-secondary">Save</button>
+      <button @click="save()" style="width: 50%;" class="btn-secondary">Save</button>
     </div>
   </div>
 </template>
@@ -32,38 +32,38 @@
 import IngredientListItem from './ingredient-list-item.vue';
 
 export default {
-  name: "recipe-create-form",
-  emits: ["update:visible"],
-  props: ["visible"],
+  name: "recipe-edit-form",
+  emits: ["save", "cancel"],
+  props: ["recipe"],
   components: {
     "ingredient-list-item" : IngredientListItem
   },
   data() {
     return {
-      name: "",
-      time: "",
-      amount: "",
-      input: [],
+      name: this.recipe.name,
+      time: this.recipe.time,
+      amount: this.recipe.amount,
+      input: this.recipe.input,
       selectedInput: "",
     };
   },
   methods: {
-    submit() {
+    save() {
       if (this.name != "" && this.time != "" && this.amount != "") {
-        this.$data.repository.addRecipe(
-          this.name,
-          this.time,
-          this.amount,
-          this.input
-        );
-
-        this.clearFields();
+        this.$emit("save", {
+          id: this.recipe.id,
+          name: this.name,
+          time: this.time,
+          amount: this.amount,
+          input: this.input
+        });
       }
-      this.$emit("update:visible", false);
+
+      this.clearFields();
     },
     cancel() {
       this.clearFields();
-      this.$emit("update:visible", false);
+      this.$emit("cancel");
     },
     clearFields() {
       this.name = "";

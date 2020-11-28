@@ -100,6 +100,17 @@ const repository = {
 
         this.saveRecipes();
     },
+    updateRecipe(oldRecipe, name, time, amount, input) {
+        if (oldRecipe.name != name && this.recipeNameExists(name)) return false;
+
+        let i = this.state.recipes.indexOf(oldRecipe)
+        this.state.recipes[i].name = name;
+        this.state.recipes[i].time = time;
+        this.state.recipes[i].amount = amount;
+        this.state.recipes[i].input = input;
+
+        this.saveRecipes();
+    },
     getRecipes() {
         return this.state.recipes;
     },
@@ -111,6 +122,9 @@ const repository = {
     },
     recipeNameExists(name) {
         return this.state.recipes.filter(x => x.name == name).length ? true : false;
+    },
+    deleteRecipe(recipe) {
+        this.state.recipes.splice(this.input.indexOf(recipe), 1)
     },
     addRecipeMock() {
         this.state.recipes.push({

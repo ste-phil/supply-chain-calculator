@@ -1,6 +1,6 @@
 <template>
   <div class="row" style="margin-bottom: 0px;">
-      <div class="lg-2 sm-4 col sb2" style="height: 100vh; overflow-y: auto;">
+      <div class="lg-3 sm-4 col sb2" style="height: 100vh; overflow-y: auto;">
           <div style="height:50px;">
               <button-img @click="createFormVisible = true" style="margin:3px;height:100%;z-index: 1000;" icon="gg-add" text="Add" popover-text="Add new Recipe" popover-position="popover-bottom"></button-img>
               <button-img class="to-clipboard" style="margin:3px;height:100%;z-index: 1000;" icon="gg-export" popover-text="Export Recipe" popover-position="popover-bottom"></button-img>
@@ -19,9 +19,9 @@
 
 <script>
 import ChainResolver from './components/chain-resolver.vue'
-import CreateRecipeForm from './components/recipe-create-form/recipe-create-form.vue'
+import CreateRecipeForm from './components/recipe-list/recipe-create-form.vue'
 import ButtonImg from './components/button-img.vue'
-import RecipeList from './components/recipe-list.vue'
+import RecipeList from './components/recipe-list/recipe-list.vue'
 
 
 export default {

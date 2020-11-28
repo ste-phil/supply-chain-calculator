@@ -1,6 +1,6 @@
 <template>
     <div>
-        <label style="margin: 0.15rem"><strong>{{ingredient.amount}}x</strong> {{ingredient.name}}</label>
+        <label style="margin: 0.15rem"><strong>{{ingredient.amount}}x</strong> {{findRecipeName(ingredient.recipeId)}}</label>
         <button class="btn-small action-btn" @click="$emit('ingredient-amount-modify', 1)">+</button>
         <button class="btn-small action-btn" @click="$emit('ingredient-amount-modify', -1)">-</button>
     </div>
@@ -9,7 +9,12 @@
 <script>
 export default {
     emits:["ingredient-amount-modify"],
-    props: ["ingredient"]
+    props: ["ingredient"],
+    methods: {
+        findRecipeName(recipeId) {
+            return this.$data.repository.findRecipe(recipeId).name;
+        }
+    }
 }
 </script>
 
@@ -23,5 +28,9 @@ button {
     float: right;
     height: 28px;
     line-height: 0px;
+}
+
+div {
+    height: 30px;
 }
 </style>
