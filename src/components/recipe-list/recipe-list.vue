@@ -1,16 +1,19 @@
 <template>
-    <div v-for="vr in getViewRecipes" :key="vr">
-        <div v-if="!vr.editMode" class="card" style="width: 100%; margin:10px 0 10px 0;" >
+<div class="grid">
+    <recipe-create-form></recipe-create-form>
+
+    <template v-for="vr in getViewRecipes">
+        <div v-if="!vr.editMode" :key="vr.recipe.name" class="card grid-card">
             <div class="card-body">
                 <h4 class="card-title">{{vr.recipe.name}}</h4>
                 <h5 class="card-subtitle"><strong>{{vr.recipe.amount}}x</strong> in <strong>{{vr.recipe.time}}</strong> seconds</h5>
 
-                <div v-if="vr.recipe.input.length > 0" class="collapsible">
-                    <input :id="'collapsible' + vr.recipe.id" type="checkbox" name="collapsible">
-                    <label :for="'collapsible' + vr.recipe.id" style="padding: 0.15rem">Ingredients</label>
+                <div v-if="vr.recipe.inputs.length > 0" class="collapsible">
+                    <input :id="'collapsible' + vr.recipe.name" type="checkbox" name="collapsible">
+                    <label :for="'collapsible' + vr.recipe.name" style="padding: 0.15rem">Ingredients</label>
                     <div class="collapsible-body">
-                        <h6 v-for="input in vr.recipe.input" style="margin: 0.15rem" :key="input">
-                            <strong>{{input.amount}}x</strong> {{findRecipeName(input.recipeId)}}
+                        <h6 v-for="input in vr.recipe.inputs" style="margin: 0.15rem" :key="input.recipeName">
+                            <strong>{{input.amount}}x</strong> {{input.recipeName}}
                         </h6>
                     </div>
                 </div>
@@ -20,60 +23,65 @@
             </div>
         </div>
 
-        <recipe-edit-form v-if="vr.editMode" :recipe="vr.recipe" @save="recipeEditSaved($event, vr)"  @cancel="recipeEditCanceled(vr)"></recipe-edit-form>
-    </div>
-
-    
+        <recipe-edit-form :key="vr.recipe.name" v-if="vr.editMode" :recipe="vr.recipe" @submit="vr.editMode = false"  ></recipe-edit-form>
+    </template>
+</div>
 </template>
 
-<script>
-import { reactive } from 'vue';
+<script lang="ts">
+import { Component, Mixins } from "vue-property-decorator";
+import StoreMixin from "@/store/store";
 import RecipeEditForm from './recipe-edit-form.vue';
+import RecipeCreateForm from './recipe-create-form.vue';
+import Vue from 'vue'
+import { Recipe } from "@/store/entities";
 
-export default {
-    name: "recipe-list",
-    props: [],
+class ViewRecipe {
+    constructor(public recipe: Recipe, public editMode: boolean) {}
+}
+
+@Component({
     components: {
-        "recipe-edit-form": RecipeEditForm
-    },
-    methods: {
-        findRecipeName(recipeId) {
-            return this.$data.repository.findRecipe(recipeId).name;
-        },
-        changeMode(vr) {
-            vr.editMode = !vr.editMode;
-        },
-        recipeEditSaved(editedRecipe, vr) {
-            this.$data.repository.updateRecipe(
-                vr.recipe,
-                editedRecipe.name,
-                editedRecipe.time,
-                editedRecipe.amount,
-                editedRecipe.input
-            );
+        RecipeEditForm, RecipeCreateForm
+    }
+})
+export default class RecipeList extends Mixins(StoreMixin) {
+    changeMode(vr: ViewRecipe) {
+        vr.editMode = !vr.editMode;
+    }
 
-            this.changeMode(vr);
-        },
-        recipeEditCanceled(vr) {
-            this.changeMode(vr);
-        },
-        isRecipeDeletable(vr) {
-            return this.$data.repository.isRecipeDeletable(vr.recipe);
-        },
-        deleteEntry(vr) {
-            this.$data.repository.deleteRecipe(vr.recipe)
-        }
-    },
-    computed: {
-        getViewRecipes: function() {
-            return this.$data.repository.getRecipes().map(recipe =>  {
-                return reactive({recipe, editMode: false})
-            })
-        }
+    isRecipeDeletable(vr: ViewRecipe) {
+        return this.store.book.isRecipeDeletable(vr.recipe);
+    }
+
+    deleteEntry(vr: ViewRecipe) {
+        this.$data.repository.deleteRecipe(vr.recipe)
+    }
+
+    get getViewRecipes() {
+        return this.store.book.getRecipes().map((recipe: Recipe) =>  {
+            return Vue.observable(new ViewRecipe(recipe, false))
+        })
     }
 }
 </script>
 
-<style>
+<style scoped>
+.card {
+    float: left;
+    margin: 10px;
+    min-width: 14rem;
+    max-width: 20rem;
+    min-height: 8.5rem;
+}
 
+.grid {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+}
+
+.grid-card {
+
+}
 </style>

@@ -1,5 +1,17 @@
 <template>
-  <div v-if="visible" class="card" style="width: 100%; margin:10px 0 10px 0;">
+<div>
+  <div 
+    v-if="!adding" 
+    class="card" 
+    style="margin:10px; cursor: pointer;"
+    @click="adding = true;"
+  >
+    <div class="card-body card-add" style="margin: 0 auto;" >
+      <span class="material-icons material-icons-large">add_circle_outline</span>
+    </div> 
+  </div>
+
+  <div v-if="adding" class="card" style="margin:10px;">
     <div class="card-body">
       <input v-model="name" style="margin: 0 0 5px 0; width: 100%;" placeholder="Name"/>
       <input v-model="time" style="margin: 0 0 5px 0; width: 100%;" placeholder="Time (seconds)" type="number"/>
@@ -9,15 +21,15 @@
       <input v-model="selectedInput" placeholder="Select Inputs" list="recipes-create" style="margin: 0 0 5px 0; width: calc(100% - 35px); float:left;">
       <button @click="addSelectedInput" class="btn-small" style="float:left; font-size:19px; ">+</button>
       <datalist id="recipes-create" >
-          <option v-for="recipe in repository.getRecipes()" :key="recipe" :value="recipe.name" :data-id="recipe.id"></option>
+          <option v-for="recipe in store.book.getRecipes()" :key="recipe.name" :value="recipe.name" :data-id="recipe.id"></option>
       </datalist>
       </div>
 
       <div v-if="input.length > 0" style="float:none;width:100%;">
         <hr >
-        <label class="border">Ingredients</label>
+        <label class="header-border">Ingredients</label>
         <div style="padding: 10px; background-color:var(--white-dark-light-80)">
-            <ingredient-list-item v-for="ingredient in input" :key="ingredient" :ingredient="ingredient" @ingredient-amount-modify="modifiyIngredientAmount(ingredient, $event)"></ingredient-list-item>
+            <ingredient-list-item v-for="ingredient in input" :key="ingredient.name" :ingredient="ingredient" @ingredient-amount-modify="modifyInputAmount(ingredient, $event)"></ingredient-list-item>
         </div>
       </div>
       <br/>
@@ -26,79 +38,77 @@
       <button @click="submit()" style="width: 50%;" class="btn-secondary">Save</button>
     </div>
   </div>
+</div>
 </template>
 
-<script>
+<script lang="ts">
+import { RecipeInput } from '@/store/entities';
+import StoreMixin from '@/store/store';
+import Component from 'vue-class-component';
+import { Mixins } from 'vue-property-decorator';
 import IngredientListItem from './ingredient-list-item.vue';
 
-export default {
-  name: "recipe-create-form",
-  emits: ["update:visible"],
-  props: ["visible"],
+@Component({
   components: {
-    "ingredient-list-item" : IngredientListItem
-  },
-  data() {
-    return {
-      name: "",
-      time: "",
-      amount: "",
-      input: [],
-      selectedInput: "",
-    };
-  },
-  methods: {
-    submit() {
-      if (this.name != "" && this.time != "" && this.amount != "") {
-        this.$data.repository.addRecipe(
-          this.name,
-          this.time,
-          this.amount,
-          this.input
-        );
+    IngredientListItem
+  }
+})
+export default class RecipeCreateForm extends Mixins(StoreMixin) {
+  adding = false;
+  name = "";
+  time = "";
+  amount = "";
+  input = new Array<RecipeInput>();
+  selectedInput = "";
 
-        this.clearFields();
-      }
-      this.$emit("update:visible", false);
-    },
-    cancel() {
+  submit() {
+    if (this.name != "" && this.time != "" && this.amount != "") {
+      this.store.book.addRecipe(
+        this.name,
+        Number(this.time),
+        Number(this.amount),
+        this.input
+      );
+      this.store.saveBook();
+
       this.clearFields();
-      this.$emit("update:visible", false);
-    },
-    clearFields() {
-      this.name = "";
-      this.time = "";
-      this.amount = "";
-      this.input = [];
-    },
-    findRecipeName(recipeId) {
-      return this.repository.findRecipe(recipeId).name;
-    },
-    addSelectedInput() {
-      let recipe = this.$data.repository.findRecipeByName(this.selectedInput);
-
-      for (let i = 0; i < this.input.length; i++) {
-        if (this.input[i].recipeId == recipe.id) {
-          this.input[i].amount++;
-          this.selectedInput = "";
-          return;
-        }
-      }
-
-      this.input.push({recipeId: recipe.id, amount: 1, name: recipe.name})
-
-      //Clear current selection
-      this.selectedInput = "";
-    },
-    modifiyIngredientAmount(ing, amount) {
-      if (ing.amount + amount > 0) ing.amount += amount;
-      else this.input.splice(this.input.indexOf(ing), 1)
     }
-  },
-};
+    this.adding = false;
+  }
+  cancel() {
+    this.clearFields();
+    this.adding = false;
+  }
+  clearFields() {
+    this.name = "";
+    this.time = "";
+    this.amount = "";
+    this.input = [];
+  }
+  addSelectedInput() {
+    const recipe = this.store.book.findRecipe(this.selectedInput);
+
+    for (let i = 0; i < this.input.length; i++) {
+      if (this.input[i].recipeName == recipe.name) {
+        this.input[i].amount++;
+        this.selectedInput = "";
+        return;
+      }
+    }
+
+    this.input.push(new RecipeInput(1, recipe.name));
+
+    //Clear current selection
+    this.selectedInput = "";
+  }
+  modifyInputAmount(ing: RecipeInput, amount: number) {
+    if (ing.amount + amount > 0) ing.amount += amount;
+    else this.input.splice(this.input.indexOf(ing), 1)
+  }
+}
+
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .clearfix:after {
   content: "";
@@ -106,7 +116,7 @@ export default {
   display: table;
 }
 
-.border {
+.header-border {
   color: #41403e;
   color: var(--primary);
   border-bottom: 1px solid #41403e;
@@ -121,6 +131,20 @@ export default {
   border-left: none;
   border-right: none;
   border-radius: 0px;
+}
+
+.card {
+    float: left;
+    margin: 10px;
+    min-width: 14rem;
+    max-width: 20rem;
+    min-height: 8.5rem;
+}
+
+.card-add {
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
 }
 
 </style>

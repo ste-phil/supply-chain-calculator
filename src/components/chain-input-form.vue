@@ -1,13 +1,14 @@
 <template>
+<div>
   <div class="form-group">
-    <label for="recipeName">Recipe to make</label>
-    <input v-model="recipeName" placeholder="Select Recipe" list="recipes" />
+    <label for="request.name">Recipe to make</label>
+    <input v-model="request.name" placeholder="Select Recipe" list="recipes" />
     <datalist id="recipes">
       <option
-        v-for="recipe in repository.getRecipes()"
-        :key="recipe"
+        v-for="recipe in store.book.getRecipes()"
+        :key="recipe.name"
         :value="recipe.name"
-        :data-id="recipe.id"
+        :data-id="recipe.name"
       ></option>
     </datalist>
   </div>
@@ -16,38 +17,36 @@
     <input v-model="request.amount" type="number"/>
   </div>
   <button @click="tryRequest">Calculate</button>
+</div>
 </template>
 
-<script>
-export default {
-  name: "chain-input-form",
-  data() {
-    return {
-      recipeName: "",
-      request: {
-        recipeId: "",
-        amount: 1,
-      },
-    };
-  },
-  emits: {
-    "resolve-requested": (data) => {
-      if (data.recipeId && data.amount) return true;
-      return false;
-    },
-  },
-  methods: {
-    tryRequest() {
-      let recipe = this.repository.findRecipeByName(this.recipeName);
+<script lang="ts">
+import StoreMixin from '@/store/store';
+import { Component, Emit, Mixins } from 'vue-property-decorator';
 
-      if (recipe && this.request.amount > 0)
-        this.$emit("resolve-requested", {
-          recipeId: recipe.id,
-          amount: this.request.amount,
-        });
-    },
-  },
-};
+@Component({})
+export default class ChainInputForm extends Mixins(StoreMixin) {
+  request = {
+    name: "",
+    amount: 1,
+  };
+
+  @Emit("resolve-requested") 
+  resolveRequested(data: any): boolean {
+    if (data.name && data.amount) return true;
+    return false;
+  }
+
+  tryRequest() {
+    if (this.request.name && this.request.amount > 0)
+      this.$emit("resolve-requested", {
+        recipeName: this.request.name,
+        amount: this.request.amount,
+      });
+  }
+
+}
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

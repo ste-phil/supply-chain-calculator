@@ -1,12 +1,16 @@
 <template>
+<div>
   <div class="paper">
+    <h2 class="header-corner">Input</h2>
     <chain-input-form @resolve-requested='resolveRequested'></chain-input-form>
   </div>
   <hr>
 
   <div class="paper">
+    <h2 class="header-corner">Results</h2>
     <chain-calculator :request='request'></chain-calculator>
   </div>
+</div>
 </template>
 
 <script>

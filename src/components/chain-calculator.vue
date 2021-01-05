@@ -1,4 +1,5 @@
 <template>
+<div>
   <fieldset
     class="form-group"
     style="float: right; top: 0; right: 0; cursor: pointer">
@@ -10,7 +11,6 @@
     <label class="paper-switch-label">Items per seconds</label>
   </fieldset>
 
-  <p>Results:</p>
   <br />
   <div>
     <div v-if="itemsPerSecondsMode">
@@ -24,65 +24,73 @@
       </p>
     </div>
   </div>
+</div>
 </template>
 
-<script>
-export default {
-  name: "chain-calculator",
-  data() {
-    return {
-      itemsPerSecondsMode: true,
-      results: [],
-    };
-  },
-  props: ["request"],
-  watch: {
-    request(newVal) {
-      let requiredResourcesDict = {};
+<script lang="ts">
+import { Recipe } from "@/store/entities";
+import StoreMixin from "@/store/store";
+import { Component, Mixins, Prop, Watch } from "vue-property-decorator";
 
-      let recipe = this.$data.repository.findRecipe(newVal.recipeId);
-      let makeAmount = newVal.amount;
+class ResolveResult {
+  constructor(public name: string, public amountFactories: number, public perSecond: number) {}
+}
 
-      this.resolveRequirements(requiredResourcesDict, recipe, makeAmount);
-      this.prepareResults(requiredResourcesDict);
-    },
-  },
-  methods: {
-    resolveRequirements(requiredResourcesDict, recipe, makeAmount) {
-      for (let i = 0; i < recipe.input.length; i++) {
-        let subRecipe = this.$data.repository.findRecipe(recipe.input[i].recipeId);
-        let requiredSubAmount = (makeAmount * subRecipe.amount) / recipe.time; //required items per second
+@Component({})
+export default class ChainCalculator extends Mixins(StoreMixin) {
+  itemsPerSecondsMode = true;
+  results: Array<ResolveResult> = [];
 
-        if (!requiredResourcesDict[subRecipe.id])
-          requiredResourcesDict[subRecipe.id] = 0;
-        requiredResourcesDict[subRecipe.id] += requiredSubAmount;
+  @Prop({required: true})
+  request: any;
 
-        if (subRecipe.input.length > 0)
-          this.resolveRequirements(
-            requiredResourcesDict,
-            subRecipe,
-            requiredSubAmount
-          );
-      }
-    },
-    prepareResults(requiredRecourcesDict) {
-      this.results = [];
+  @Watch("request")
+  requestChanged(newVal: any) {
+    const requiredResourcesDict = {};
 
-      for (let recipeId in requiredRecourcesDict) {
-        let recipe = this.$data.repository.findRecipe(recipeId);
+    const recipe = this.store.book.findRecipe(newVal.recipeName);
+    const makeAmount = newVal.amount;
 
-        this.results.push({
-          id: recipeId,
-          name: recipe.name,
-          amountFactories: requiredRecourcesDict[recipeId] * recipe.time,
-          perSecond: requiredRecourcesDict[recipeId],
-        });
-      }
+    this.resolveRequirements(requiredResourcesDict, recipe, makeAmount);
+    this.prepareResults(requiredResourcesDict);
+  }
 
-      this.results.reverse();
-    },
-  },
-};
+  resolveRequirements(requiredResourcesDict: any, recipe: Recipe, makeAmount: number) {
+    for (let i = 0; i < recipe.inputs.length; i++) {
+      const subRecipe = this.store.book.findRecipe(recipe.inputs[i].recipeName);
+      if (subRecipe == null) throw new Error("Couldn`t find input recipe with the name: " + recipe.inputs[i].recipeName + " for the recipe: " + recipe.name)
+      
+      const requiredSubAmount = (makeAmount * subRecipe.amount) / recipe.time; //required items per second
+
+      if (!requiredResourcesDict[subRecipe.name])
+        requiredResourcesDict[subRecipe.name] = 0;
+      requiredResourcesDict[subRecipe.name] += requiredSubAmount;
+
+      if (subRecipe.inputs.length > 0)
+        this.resolveRequirements(
+          requiredResourcesDict,
+          subRecipe,
+          requiredSubAmount
+        );
+    }
+  }
+
+  prepareResults(requiredRecourcesDict: any) {
+    this.results = new Array<ResolveResult>();
+
+    for (const recipeName in requiredRecourcesDict) {
+      const recipe = this.store.book.findRecipe(recipeName);
+
+      this.results.push(new ResolveResult(
+        recipe.name,
+        requiredRecourcesDict[recipe.name] * recipe.time,
+        requiredRecourcesDict[recipe.name]
+      ));
+    }
+
+    // this.results.reverse();
+  }
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
