@@ -55,7 +55,7 @@ export default class RecipeList extends Mixins(StoreMixin) {
     }
 
     deleteEntry(vr: ViewRecipe) {
-        this.$data.repository.deleteRecipe(vr.recipe)
+        this.store.book.deleteRecipe(vr.recipe)
     }
 
     get getViewRecipes() {
