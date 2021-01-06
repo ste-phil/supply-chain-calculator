@@ -109,7 +109,8 @@ export default class LibraryList extends Mixins(StoreMixin) {
 
   openContextMenu(bookInfo: RecipeBookInfo, event: any): void {
     this.bookCM = bookInfo;
-    this.$refs.menu.open(event);
+    const menu = this.$refs.menu as any;
+    menu.open(event);
   }
   
   deleteBookCM(): void {
