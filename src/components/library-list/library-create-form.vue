@@ -33,7 +33,7 @@
             class="action-bar-item btn-secondary btn-small"
             @click.stop="addBook()">Save</button>
       </div>
-      </div>
+    </div>
       
     </div>
   </template>
@@ -45,13 +45,18 @@
 import { RecipeBookInfo } from "@/store/entities";
 import { RecipeBook } from "@/store/recipe-book";
 import StoreMixin from "@/store/store";
-import { Component, Mixins } from "vue-property-decorator";
+import { Component, Emit, Mixins } from "vue-property-decorator";
 
 @Component({})
 export default class LibraryCreateForm extends Mixins(StoreMixin) {
   isAdding = false;
   modeSelection = true;
 	bookAdding: RecipeBookInfo = {} as RecipeBookInfo;	
+
+  @Emit("added")
+  added(newBookName: string) {
+    return;
+  }
 
   addEmpty(): void {
     this.modeSelection = false;
@@ -61,16 +66,16 @@ export default class LibraryCreateForm extends Mixins(StoreMixin) {
     navigator.clipboard.readText().then(clipText => {
       try {
         const book = JSON.parse(clipText) as RecipeBook;
-        debugger;
+        const bookName = book.name + "_Import";
         if (book.name != null && book.desc != null && book.recipes != null) {
-          this.store.library.addBook(book.name + "_Import", book.desc, book.recipes);
+          this.store.library.addBook(bookName, book.desc, book.recipes);
         }
 
-        this.endAdd();
+        this.endAdd(bookName);
       }
       catch(e)
       {
-        this.endAdd();
+        this.endAdd(null);
       }
 
     });
@@ -80,15 +85,14 @@ export default class LibraryCreateForm extends Mixins(StoreMixin) {
     const success = this.store.library.addBook(this.bookAdding.name, this.bookAdding.desc, []);
     if (!success) return; //Book not added due to some errors
 
-    this.endAdd();
-    // const bi = this.store.library.tryGetBookInfo(this.bookAdding.name)!;
-    // this.booksViewModel.splice(0, 0, new LibraryListViewModel(bi, false, null))
-    // this.isAdding = !this.isAdding;
+    this.endAdd(this.bookAdding.name);
   }
 
-  endAdd() {
+  endAdd(bookName: string | null) {
     this.isAdding = false;
     this.modeSelection = true;
+
+    this.$emit("added", bookName);
   }
 }
 </script>

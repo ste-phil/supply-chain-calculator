@@ -3,7 +3,7 @@
     <recipe-create-form></recipe-create-form>
 
     <template v-for="vr in getViewRecipes">
-        <div v-if="!vr.editMode" :key="vr.recipe.name" class="card grid-card">
+        <div v-if="!vr.editMode" :key="vr.recipe.name" class="card">
             <div class="card-body">
                 <h4 class="card-title">{{vr.recipe.name}}</h4>
                 <h5 class="card-subtitle"><strong>{{vr.recipe.amount}}x</strong> in <strong>{{vr.recipe.time}}</strong> seconds</h5>
@@ -80,9 +80,5 @@ export default class RecipeList extends Mixins(StoreMixin) {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-around;
-}
-
-.grid-card {
-
 }
 </style>

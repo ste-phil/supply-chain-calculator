@@ -1,7 +1,7 @@
 <template>
   <div class="card" style="width: 100%; margin:10px 0 10px 0;">
     <div class="card-body">
-      <input v-model="recipe.name" style="margin: 0 0 5px 0; width: 100%;" placeholder="Name"/>
+      <input readonly class="disabled" v-model="recipe.name" style="margin: 0 0 5px 0; width: 100%;" placeholder="Name"/>
       <input v-model="recipe.time" style="margin: 0 0 5px 0; width: 100%;" placeholder="Time (seconds)" type="number"/>
       <input v-model="recipe.amount" style="margin: 0 0 5px 0; width: 100%;" placeholder="Amount" type="number"/>
       
@@ -17,7 +17,7 @@
         <hr >
         <label class="header-border">Ingredients</label>
         <div style="padding: 10px; background-color:var(--white-dark-light-80)">
-            <ingredient-list-item v-for="ingredient in recipe.inputs" :key="ingredient" :ingredient="ingredient" @ingredient-amount-modify="modifyInputAmount(ingredient, $event)"></ingredient-list-item>
+            <ingredient-list-item v-for="ingredient in recipe.inputs" :key="ingredient.name" :ingredient="ingredient" @ingredient-amount-modify="modifyInputAmount(ingredient, $event)"></ingredient-list-item>
         </div>
       </div>
       <br/>

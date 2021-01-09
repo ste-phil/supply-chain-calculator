@@ -1,6 +1,6 @@
 <template>
   <div class="clearfix">
-    <library-create-form></library-create-form>
+    <library-create-form @added="addedBook"></library-create-form>
 
     <div v-for="vm in booksViewModel" 
       :key="vm.name" class="card" 
@@ -63,8 +63,6 @@ class LibraryListViewModel {
 })
 export default class LibraryList extends Mixins(StoreMixin) {
   isAdding = false;
-  bookAdding: RecipeBookInfo = {} as RecipeBookInfo;
-  bookEditing!: RecipeBookInfo;
   bookCM!: RecipeBookInfo;  
   
   booksViewModel!: LibraryListViewModel[];
@@ -82,13 +80,12 @@ export default class LibraryList extends Mixins(StoreMixin) {
     );
   }
 
-  addBook(): void {
-    const success = this.store.library.addBook(this.bookAdding.name, this.bookAdding.desc, []);
-    if (!success) return; //Book not added due to some errors
-
-    const bi = this.store.library.tryGetBookInfo(this.bookAdding.name)!;
-    this.booksViewModel.splice(0, 0, new LibraryListViewModel(bi, false, null))
-    this.isAdding = !this.isAdding;
+  addedBook(newBookName: string | null) {
+    if (newBookName == null) return;
+    
+    const bi = this.store.library.tryGetBookInfo(newBookName)!;
+    this.booksViewModel.splice(0, 0, new LibraryListViewModel(bi, false, null));
+    this.$forceUpdate();
   }
 
   startEditModeBookInfo(vm: LibraryListViewModel): void {
