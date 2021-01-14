@@ -1,10 +1,6 @@
 <template>
-<div class="card">
-  <template 
-    v-if="!adding" 
-    style="cursor: pointer;"
-    @click="adding = true;"
-  >
+<div class="card" @click="adding = true;" style="cursor: pointer;">
+  <template v-if="!adding" >
     <div class="card-body card-add" style="margin: 0 auto;" >
       <span class="material-icons material-icons-large">add_circle_outline</span>
     </div> 
@@ -33,8 +29,8 @@
       </div>
       <br/>
 
-      <button @click="cancel()" style="width: 50%;" class="btn-danger">Cancel</button>
-      <button @click="submit()" style="width: 50%;" class="btn-secondary">Save</button>
+      <button @click.stop="cancel()" style="width: 50%;" class="btn-danger">Cancel</button>
+      <button @click.stop="submit()" style="width: 50%;" class="btn-secondary">Save</button>
     </div>
   </template>
 </div>
