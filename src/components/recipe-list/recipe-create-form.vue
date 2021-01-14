@@ -1,17 +1,16 @@
 <template>
-<div>
-  <div 
+<div class="card">
+  <template 
     v-if="!adding" 
-    class="card" 
-    style="margin:10px; cursor: pointer;"
+    style="cursor: pointer;"
     @click="adding = true;"
   >
     <div class="card-body card-add" style="margin: 0 auto;" >
       <span class="material-icons material-icons-large">add_circle_outline</span>
     </div> 
-  </div>
+  </template>
 
-  <div v-if="adding" class="card" style="margin:10px;">
+  <template v-if="adding">
     <div class="card-body">
       <input v-model="name" style="margin: 0 0 5px 0; width: 100%;" placeholder="Name"/>
       <input v-model="time" style="margin: 0 0 5px 0; width: 100%;" placeholder="Time (seconds)" type="number"/>
@@ -37,7 +36,7 @@
       <button @click="cancel()" style="width: 50%;" class="btn-danger">Cancel</button>
       <button @click="submit()" style="width: 50%;" class="btn-secondary">Save</button>
     </div>
-  </div>
+  </template>
 </div>
 </template>
 
@@ -131,14 +130,6 @@ export default class RecipeCreateForm extends Mixins(StoreMixin) {
   border-left: none;
   border-right: none;
   border-radius: 0px;
-}
-
-.card {
-    float: left;
-    margin: 10px;
-    min-width: 14rem;
-    max-width: 20rem;
-    min-height: 8.5rem;
 }
 
 .card-add {

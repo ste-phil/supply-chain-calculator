@@ -1,6 +1,6 @@
 <template>
   <div class="clearfix">
-    <library-create-form @added="addedBook"></library-create-form>
+    <library-create-form @added="addedBook" ref="cf"></library-create-form>
 
     <div v-for="vm in booksViewModel" 
       :key="vm.name" class="card" 

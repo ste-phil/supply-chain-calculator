@@ -16,7 +16,7 @@
     <label for="request.amount">Amount (per second)</label>
     <input v-model="request.amount" type="number"/>
   </div>
-  <button @click="tryRequest">Calculate</button>
+  <button @click="tryRequest" class="btn-primary">Calculate</button>
 </div>
 </template>
 
@@ -51,4 +51,8 @@ export default class ChainInputForm extends Mixins(StoreMixin) {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
+input {
+  width: 100%;
+}
 </style>

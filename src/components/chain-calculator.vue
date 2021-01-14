@@ -46,21 +46,37 @@ export default class ChainCalculator extends Mixins(StoreMixin) {
 
   @Watch("request")
   requestChanged(newVal: any) {
-    const requiredResourcesDict = {};
+    const requiredResourcesDict = {} as any;
 
     const recipe = this.store.book.findRecipe(newVal.recipeName);
     const makeAmount = newVal.amount;
+
+    requiredResourcesDict[recipe.name] = makeAmount;
 
     this.resolveRequirements(requiredResourcesDict, recipe, makeAmount);
     this.prepareResults(requiredResourcesDict);
   }
 
+/*
+3/35 für 5 Gelbe (3 Prozessoren alle 35 Sekunden für 5 Gelbe) 			5/35 => 0.14 Gelbe/sec  
+=> 0.086 Prozessoren/sec für 5 Gelbe/35 sec (0.14 Gelbe/sec)
+=> Wollen = 2
+	=> 2 / 0.14 ~ 14
+    => Wie viele Prozessoren werden jede Sekunde gebraucht?
+  	=> 0.086 Prozessoren/sec * 14 = 1.2 Prozessoren / sec
+    
+		=> AnzahlFabriken: 1.2 / (1 / 10) = 12 Fabriken
+*/
+
   resolveRequirements(requiredResourcesDict: any, recipe: Recipe, makeAmount: number) {
+    const perSecond = recipe.amount / recipe.time;
+    const factor = makeAmount / perSecond;
+
     for (let i = 0; i < recipe.inputs.length; i++) {
       const subRecipe = this.store.book.findRecipe(recipe.inputs[i].recipeName);
       if (subRecipe == null) throw new Error("Couldn`t find input recipe with the name: " + recipe.inputs[i].recipeName + " for the recipe: " + recipe.name)
       
-      const requiredSubAmount = (makeAmount * subRecipe.amount) / recipe.time; //required items per second
+      const requiredSubAmount = factor * recipe.inputs[i].amount / recipe.time; //required items per second
 
       if (!requiredResourcesDict[subRecipe.name])
         requiredResourcesDict[subRecipe.name] = 0;
@@ -83,7 +99,7 @@ export default class ChainCalculator extends Mixins(StoreMixin) {
 
       this.results.push(new ResolveResult(
         recipe.name,
-        requiredRecourcesDict[recipe.name] * recipe.time,
+        requiredRecourcesDict[recipe.name] * recipe.time / recipe.amount,
         requiredRecourcesDict[recipe.name]
       ));
     }

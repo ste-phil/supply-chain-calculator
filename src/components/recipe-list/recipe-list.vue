@@ -69,7 +69,6 @@ export default class RecipeList extends Mixins(StoreMixin) {
 
 <style scoped>
 .card {
-    float: left;
     margin: 10px;
     min-width: 14rem;
     max-width: 20rem;
@@ -79,6 +78,6 @@ export default class RecipeList extends Mixins(StoreMixin) {
 .grid {
     display: flex;
     flex-flow: row wrap;
-    justify-content: space-around;
+    justify-content: start;
 }
 </style>

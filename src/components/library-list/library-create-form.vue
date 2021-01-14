@@ -46,6 +46,7 @@ import { RecipeBookInfo } from "@/store/entities";
 import { RecipeBook } from "@/store/recipe-book";
 import StoreMixin from "@/store/store";
 import { Component, Emit, Mixins } from "vue-property-decorator";
+import { BrowserDetect, Browser } from "@/helpers/browser-detect";
 
 @Component({})
 export default class LibraryCreateForm extends Mixins(StoreMixin) {
@@ -63,22 +64,35 @@ export default class LibraryCreateForm extends Mixins(StoreMixin) {
   }
 
   importFromClipboard(): void {
-    navigator.clipboard.readText().then(clipText => {
-      try {
-        const book = JSON.parse(clipText) as RecipeBook;
-        const bookName = book.name + "_Import";
-        if (book.name != null && book.desc != null && book.recipes != null) {
-          this.store.library.addBook(bookName, book.desc, book.recipes);
-        }
-
-        this.endAdd(bookName);
-      }
-      catch(e)
-      {
+    const browser = BrowserDetect.checkBrowser();
+    switch (browser) {
+      case Browser.Firefox:
+        alert("Get a good browser")
         this.endAdd(null);
+        break;
+      default:
+        navigator.clipboard.readText().then(clipText => {
+          const bookName = this.store.library.importBook(clipText);
+          this.endAdd(bookName);
+        });
+        break;
+    }
+  }
+
+  tryParseText(stringBook: string): void {
+    try {
+      const book = JSON.parse(stringBook) as RecipeBook;
+      const bookName = book.name + "_Import";
+      if (book.name != null && book.desc != null && book.recipes != null) {
+        this.store.library.addBook(bookName, book.desc, book.recipes);
       }
 
-    });
+      this.endAdd(bookName);
+    }
+    catch(e)
+    {
+      this.endAdd(null);
+    }
   }
 
 	addBook(): void {

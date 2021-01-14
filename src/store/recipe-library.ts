@@ -118,4 +118,20 @@ export class RecipeLibrary {
         const book = this.loadBook(bookName);
         navigator.clipboard.writeText(JSON.stringify(book));
     }
+
+    importBook(bookString: string): string | null {
+        try {
+            const book = JSON.parse(bookString) as RecipeBook;
+            const bookName = book.name + "_Import";
+
+            if (book.name != null && book.desc != null && book.recipes != null) {
+                this.addBook(bookName, book.desc, book.recipes);
+                return bookName;
+            }
+            return null;
+        }
+        catch(e) {
+            return null;
+        }
+    }
 }

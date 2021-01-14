@@ -1,14 +1,14 @@
 <template>
     <div class="nav-bar" :class="{active: isActive}">
         <div class="pie pie1" >
-            <div class="pie-color" @click="changeRoute('/library')">
+            <a class="pie-color" @click="changeRoute('/library')" href="/#/library">
                 <span class="material-icons">folder</span>
-            </div>
+            </a>
         </div>
         <div class="pie pie2">
-            <div class="pie-color" @click="changeRoute('/')">
+            <a class="pie-color" @click="changeRoute('/')" href="/#/">
                 <span class="material-icons">calculate</span>
-            </div>
+            </a>
         </div>
         <div class="nav-menu" @click="isActive = !isActive" >
             <span class="material-icons">{{isActive ? "clear" : "menu"}}</span>
@@ -106,6 +106,8 @@ export default {
         width: 100%;
         height: 100%;
         border-radius: 50%;
+        display: block;
+        background-image: none;
 
         transition: background-color 0.5s;
         color: var(--priamry);

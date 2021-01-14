@@ -10,6 +10,7 @@ export class Store {
     constructor() {
         this.library = new RecipeLibrary();
         this.book = this.library.loadLastBook();
+        (window as any).store = this;
     }
 
     saveBook() {
