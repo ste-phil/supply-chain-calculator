@@ -17,6 +17,10 @@ cp -r "dist/*" "../xxpancakexx.github.io"
 # Push to server
 echo "Pushing data to server"
 cd ../xxpancakexx.github.io
+
 git add .
 git commit -m "New Deployment"
 git push
+
+# Go back to directory
+cd "../supply-chain-calculator"

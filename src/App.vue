@@ -66,4 +66,12 @@ export default {
   flex-grow: 1;
 }
 
+.btn-inline {
+  padding: .5rem;
+}
+
+.btn-icon-inline {
+  padding: 0.15rem .5rem .5rem .5rem;
+}
+
 </style>

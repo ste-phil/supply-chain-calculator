@@ -21,7 +21,7 @@ export default {
   name: 'chain-resolver',
   data() { 
     return {
-        request: null
+      request: null
     } 
   },
   components: {
@@ -30,7 +30,7 @@ export default {
   },
   methods: {
     resolveRequested(request) {
-        this.request = request;
+      this.request = request;
     }
   },
 }

@@ -1,28 +1,43 @@
 <template>
 <div>
-  <fieldset
-    class="form-group"
-    style="float: right; top: 0; right: 0; cursor: pointer">
-    <label class="paper-switch-label">Required Factories</label>
-    <label class="paper-switch">
-      <input type="checkbox" v-model="itemsPerSecondsMode" />
-      <span class="paper-switch-slider round"></span>
-    </label>
-    <label class="paper-switch-label">Items per seconds</label>
-  </fieldset>
+  <table class="item-corner-right">
+    <tr>
+      <td>Required Factories</td>
+      <td class="form-group">
+        <label class="paper-switch">
+          <input type="checkbox" v-model="itemsPerSecondsMode" />
+          <span class="paper-switch-slider round"></span>
+        </label>
+      </td>
+      <td>Items per seconds</td>
+    </tr>
+    <tr>
+      <td>Tree</td>
+      <td class="form-group">
+        <label class="paper-switch">
+          <input type="checkbox" v-model="listMode" />
+          <span class="paper-switch-slider round"></span>
+        </label>
+      </td>
+      <td>List</td>
+    </tr>
+  </table>
 
-  <br />
-  <div>
+  <div v-if="listMode"> 
     <div v-if="itemsPerSecondsMode">
-      <p v-for="result in results" :key="result">
+      <p v-for="result in resultList" :key="result.name">
       {{ result.name }}: <strong>{{ Math.round(result.perSecond * 100) / 100 }}</strong>/s
       </p>
     </div>
     <div v-if="!itemsPerSecondsMode">
-      <p v-for="result in results" :key="result">
+      <p v-for="result in resultList" :key="result.name">
         {{ result.name }}: <strong>{{ Math.round(result.amountFactories * 100) / 100 }}</strong> Factories
       </p>
     </div>
+  </div>
+
+  <div v-if="!listMode"> 
+    <resolve-result-tree-component :tree="resultTree" :perSecondMode="itemsPerSecondsMode"></resolve-result-tree-component>
   </div>
 </div>
 </template>
@@ -31,84 +46,52 @@
 import { Recipe } from "@/store/entities";
 import StoreMixin from "@/store/store";
 import { Component, Mixins, Prop, Watch } from "vue-property-decorator";
+import Calculator, { CalculationRequest, ResolveResult, ResolveResultTree } from "@/store/calculator";
+import ResolveResultTreeComponent from "@/components/resolve-result-tree.vue";
 
-class ResolveResult {
-  constructor(public name: string, public amountFactories: number, public perSecond: number) {}
-}
-
-@Component({})
+@Component({
+  components: {
+    ResolveResultTreeComponent
+  }
+})
 export default class ChainCalculator extends Mixins(StoreMixin) {
   itemsPerSecondsMode = true;
-  results: Array<ResolveResult> = [];
+  listMode = true;
+
+  resultList: Array<ResolveResult> = [];
+  resultTree: ResolveResultTree = {} as ResolveResultTree;
 
   @Prop({required: true})
-  request: any;
+  request: CalculationRequest | null = null;
 
   @Watch("request")
-  requestChanged(newVal: any) {
-    const requiredResourcesDict = {} as any;
-
-    const recipe = this.store.book.findRecipe(newVal.recipeName);
-    const makeAmount = newVal.amount;
-
-    requiredResourcesDict[recipe.name] = makeAmount;
-
-    this.resolveRequirements(requiredResourcesDict, recipe, makeAmount);
-    this.prepareResults(requiredResourcesDict);
+  requestChanged(request: CalculationRequest) {
+    // this.results = Calculator.resolveRequirements(request);
+    this.recalculate();
   }
 
-/*
-3/35 für 5 Gelbe (3 Prozessoren alle 35 Sekunden für 5 Gelbe) 			5/35 => 0.14 Gelbe/sec  
-=> 0.086 Prozessoren/sec für 5 Gelbe/35 sec (0.14 Gelbe/sec)
-=> Wollen = 2
-	=> 2 / 0.14 ~ 14
-    => Wie viele Prozessoren werden jede Sekunde gebraucht?
-  	=> 0.086 Prozessoren/sec * 14 = 1.2 Prozessoren / sec
-    
-		=> AnzahlFabriken: 1.2 / (1 / 10) = 12 Fabriken
-*/
-
-  resolveRequirements(requiredResourcesDict: any, recipe: Recipe, makeAmount: number) {
-    const perSecond = recipe.amount / recipe.time;
-    const factor = makeAmount / perSecond;
-
-    for (let i = 0; i < recipe.inputs.length; i++) {
-      const subRecipe = this.store.book.findRecipe(recipe.inputs[i].recipeName);
-      if (subRecipe == null) throw new Error("Couldn`t find input recipe with the name: " + recipe.inputs[i].recipeName + " for the recipe: " + recipe.name)
-      
-      const requiredSubAmount = factor * recipe.inputs[i].amount / recipe.time; //required items per second
-
-      if (!requiredResourcesDict[subRecipe.name])
-        requiredResourcesDict[subRecipe.name] = 0;
-      requiredResourcesDict[subRecipe.name] += requiredSubAmount;
-
-      if (subRecipe.inputs.length > 0)
-        this.resolveRequirements(
-          requiredResourcesDict,
-          subRecipe,
-          requiredSubAmount
-        );
-    }
+  @Watch("listMode")
+  viewModeChanged(listMode: boolean) {
+    this.recalculate();
   }
 
-  prepareResults(requiredRecourcesDict: any) {
-    this.results = new Array<ResolveResult>();
+  recalculate() {
+    const request = this.request;
+    if (request == null) return;
 
-    for (const recipeName in requiredRecourcesDict) {
-      const recipe = this.store.book.findRecipe(recipeName);
-
-      this.results.push(new ResolveResult(
-        recipe.name,
-        requiredRecourcesDict[recipe.name] * recipe.time / recipe.amount,
-        requiredRecourcesDict[recipe.name]
-      ));
-    }
-
-    // this.results.reverse();
+    if (this.listMode) this.resultList = Calculator.resolveRequirements(request);
+    else this.resultTree = Calculator.resolveRequirementsTree(request);
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.item-corner-right {
+  position: relative;
+  top: -80px;
+  left: calc(100% - 400px);
+  width: 400px;
+  margin: 0px
+}
 </style>
