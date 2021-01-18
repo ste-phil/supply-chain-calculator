@@ -1,8 +1,8 @@
 <template>
     <div>
         <label style="margin: 0.15rem"><strong>{{ingredient.amount}}x</strong> {{ingredient.recipeName}}</label>
-        <button class="btn-small action-btn" @click="$emit('ingredient-amount-modify', 1)">+</button>
-        <button class="btn-small action-btn" @click="$emit('ingredient-amount-modify', -1)">-</button>
+        <button class="btn-small action-btn" @mousedown="onMouseDown($event, 1)">+</button>
+        <button class="btn-small action-btn" @mousedown="onMouseDown($event, -1)">-</button>
     </div>
 </template>
 
@@ -12,8 +12,10 @@
 //     props: ["ingredient"],
 // }
 
+//@click="$emit('ingredient-amount-modify', 1)" 
 import { RecipeInput } from "@/store/entities";
 import { Component, Emit, Prop } from "vue-property-decorator";
+import CustomEvent from "@/helpers/custom-events"
 import Vue from 'vue'
 
 @Component({})
@@ -24,6 +26,10 @@ export default class IngredientListItem extends Vue {
     @Emit("ingredient-amount-modify")
     ingredientAmountModify(amount: number) {
         return;
+    }
+
+    onMouseDown(event: MouseEvent, modifier: number) {
+        CustomEvent.onPress(event.target!, () => { this.$emit('ingredient-amount-modify', modifier) });
     }
 }
 
