@@ -109,7 +109,7 @@ export default class Calculator {
         const results = new Array<ResolveResult>();
     
         for (const recipeName in requiredRecourcesDict) {
-          const recipe = store.book.findRecipe(recipeName);
+          const recipe = store.book.findRecipe(recipeName)!;
     
           results.push(new ResolveResult(
             recipe.name,

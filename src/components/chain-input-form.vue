@@ -52,6 +52,8 @@ export default class ChainInputForm extends Mixins(StoreMixin) {
   tryRequest() {
     if (this.request.name && this.request.amount > 0) {
       const recipe = this.store.book.findRecipe(this.request.name);
+      if (recipe == null) return;
+
       const request = this.perSecondMode ? CalculationRequest.fromPerSecond(recipe, this.request.amount) : CalculationRequest.fromFactories(recipe, this.request.amount);
       this.$emit("resolve-requested", request);
     }

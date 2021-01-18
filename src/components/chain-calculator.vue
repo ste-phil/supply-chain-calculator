@@ -66,7 +66,6 @@ export default class ChainCalculator extends Mixins(StoreMixin) {
 
   @Watch("request")
   requestChanged(request: CalculationRequest) {
-    // this.results = Calculator.resolveRequirements(request);
     this.recalculate();
   }
 

@@ -44,19 +44,21 @@ export class RecipeBook {
         this.recipes[i].inputs = inputs;
     }
 
-    getRecipes() {
+    getRecipes(): Recipe[] {
         return this.recipes;
     }
 
-    findRecipe(name: string) {
-        return this.recipes.filter(x => x.name == name)[0];
+    findRecipe(name: string): Recipe | null {
+        const filtered = this.recipes.filter(x => x.name == name);
+        if (filtered.length > 0) return filtered[0]; 
+        return null;
     }
 
-    recipeNameExists(name: string) {
+    recipeNameExists(name: string): boolean {
         return this.recipes.filter(x => x.name == name).length ? true : false;
     }
 
-    isRecipeDeletable(recipeToCheck: Recipe) {
+    isRecipeDeletable(recipeToCheck: Recipe): boolean {
         for(let i = 0; i < this.recipes.length; i++) {
             const recipe = this.recipes[i];
             for(let j = 0; j < recipe.inputs.length; j++) {

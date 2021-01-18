@@ -6,7 +6,7 @@
       <input v-model="recipe.amount" style="margin: 0 0 5px 0; width: 100%;" placeholder="Amount" type="number"/>
       
       <div class="clearfix">
-        <input v-model="selectedInput" placeholder="Select Inputs" list="recipes-create" style="margin: 0 0 5px 0; width: calc(100% - 35px); float:left;">
+        <input @keyup="onKeyUp" v-model="selectedInput" placeholder="Select Inputs" list="recipes-create" style="margin: 0 0 5px 0; width: calc(100% - 35px); float:left;">
         <button @click="addSelectedInput" class="btn-small" style="float:left; font-size:19px; ">+</button>
         <datalist id="recipes-create" >
             <option v-for="recipe in store.book.getRecipes()" :key="recipe.name" :value="recipe.name" :data-id="recipe.id"></option>
@@ -62,6 +62,7 @@ export default class RecipeEditForm extends Mixins(StoreMixin) {
   }
   addSelectedInput() {
     const recipe = this.store.book.findRecipe(this.selectedInput);
+    if (recipe == null) return;
 
     for (let i = 0; i < this.recipe.inputs.length; i++) {
       if (this.recipe.inputs[i].recipeName == recipe.name) {
@@ -79,6 +80,11 @@ export default class RecipeEditForm extends Mixins(StoreMixin) {
   modifyInputAmount(ing: RecipeInput, amount: number) {
     if (ing.amount + amount > 0) ing.amount += amount;
     else this.recipe.inputs.splice(this.recipe.inputs.indexOf(ing), 1)
+  }
+  onKeyUp(event: KeyboardEvent) {
+    if (event.key == "Enter") {
+      this.addSelectedInput();
+    }
   }
 }
 </script>
