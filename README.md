@@ -19,8 +19,7 @@ It features different data set stores, which hold the recipes to manufacture the
 
 
 
-## See a working demo under: https://xxpancakexx.github.io/#/
-
+## See a working demo under: https://ste-phil.github.io/scc-demo/
 
 ## Project setup for local development / usage
 
