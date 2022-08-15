@@ -37,7 +37,7 @@
   </div>
 
   <div v-if="!listMode"> 
-    <resolve-result-tree-component :tree="resultTree" :perSecondMode="itemsPerSecondsMode"></resolve-result-tree-component>
+    <resolve-result-tree-component :tree="resultTree" :perSecondMode="itemsPerSecondsMode" :level="0"></resolve-result-tree-component>
   </div>
 </div>
 </template>
@@ -46,13 +46,17 @@
 import { Recipe } from "@/store/entities";
 import StoreMixin from "@/store/store";
 import { Component, Mixins, Prop, Watch } from "vue-property-decorator";
-import Calculator, { CalculationRequest, ResolveResult, ResolveResultTree } from "@/store/calculator";
+import Calculator, {
+  CalculationRequest,
+  ResolveResult,
+  ResolveResultTree,
+} from "@/store/calculator";
 import ResolveResultTreeComponent from "@/components/resolve-result-tree.vue";
 
 @Component({
   components: {
-    ResolveResultTreeComponent
-  }
+    ResolveResultTreeComponent,
+  },
 })
 export default class ChainCalculator extends Mixins(StoreMixin) {
   itemsPerSecondsMode = true;
@@ -61,7 +65,7 @@ export default class ChainCalculator extends Mixins(StoreMixin) {
   resultList: Array<ResolveResult> = [];
   resultTree: ResolveResultTree = {} as ResolveResultTree;
 
-  @Prop({required: true})
+  @Prop({ required: true })
   request: CalculationRequest | null = null;
 
   @Watch("request")
@@ -78,7 +82,8 @@ export default class ChainCalculator extends Mixins(StoreMixin) {
     const request = this.request;
     if (request == null) return;
 
-    if (this.listMode) this.resultList = Calculator.resolveRequirements(request);
+    if (this.listMode)
+      this.resultList = Calculator.resolveRequirements(request);
     else this.resultTree = Calculator.resolveRequirementsTree(request);
   }
 }
@@ -91,6 +96,6 @@ export default class ChainCalculator extends Mixins(StoreMixin) {
   top: -80px;
   left: calc(100% - 400px);
   width: 400px;
-  margin: 0px
+  margin: 0px;
 }
 </style>
