@@ -60,7 +60,7 @@ import ResolveResultTreeComponent from "@/components/resolve-result-tree.vue";
 })
 export default class ChainCalculator extends Mixins(StoreMixin) {
   itemsPerSecondsMode = true;
-  listMode = true;
+  listMode = false;
 
   resultList: Array<ResolveResult> = [];
   resultTree: ResolveResultTree = {} as ResolveResultTree;

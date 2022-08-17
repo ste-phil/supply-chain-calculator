@@ -1,21 +1,28 @@
 <template>
-  <details>
-      <summary>
-        <img v-for="l in level+1" :key="l" src="/list-images/list-item.png"/>
-        <p v-if="perSecondMode"> {{ tree.result.name }}: <strong>{{ Math.round(tree.result.perSecond * 100) / 100 }}</strong>/s</p>
-        <p v-if="!perSecondMode"> {{ tree.result.name }}: <strong>{{ Math.round(tree.result.amountFactories * 100) / 100 }}</strong> Factories </p>
-      </summary>
-
-      <div v-for="sr in tree.subResults" :key="sr.name" class="indent">
-          <!-- <img src="/list-images/list-item.png"/> -->
-          <resolve-result-tree :tree="sr" :perSecondMode="perSecondMode" :level="level+1"></resolve-result-tree>
+  <ul :class="{closed: !visible}">
+      <div class="border border-primary" @click="visible = !visible; " :class="{collabsable: tree.subResults.length > 0}">
+        <!-- <img v-for="l in level+1" :key="l" src="/list-images/list-item.png"/> -->
+        <div v-if="perSecondMode"> 
+          <p>{{ tree.result.name }}</p>
+          <p><strong>{{ Math.round(tree.result.perSecond * 100) / 100 }}</strong>/s</p>
+        </div>
+        <div v-if="!perSecondMode"> 
+          <p>{{ tree.result.name }}</p>
+          <p><strong>{{ Math.round(tree.result.amountFactories * 100) / 100 }}</strong> Factories </p>
+        </div>
       </div>
-  </details>
+
+      <li v-for="sr in tree.subResults" :key="sr.name" :class="{closed: !visible}" ref="el" >
+        <!-- <div class="horizontal-line"></div> -->
+        <!-- <img src="/list-images/list-item.png"/> -->
+        <resolve-result-tree :tree="sr" :perSecondMode="perSecondMode" :level="level+1"></resolve-result-tree>
+      </li>
+  </ul>
 </template>
 
 <script lang="ts">
-import { ResolveResult, ResolveResultTree } from "@/store/calculator";
-import { Component, Prop } from "vue-property-decorator";
+import { ResolveResultTree } from "@/store/calculator";
+import { Component, Prop} from "vue-property-decorator";
 import Vue from 'vue'
 
 @Component({
@@ -31,97 +38,103 @@ export default class ResolveResultTreeComponent extends Vue {
 
     @Prop({ required: true })
     level!: number;
+
+    visible = this.level == 0 ? true : false;
+    isAnimating = false;
 }
 </script>
 
 <style scoped>
-.indent {
-  margin-left: 0px;
-}
 
-
-img {
-  border: none;
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-}
-
-.root-img {
-  height: 20px;
-}
-
-
-details {
-  display: inline-block;
-  top: 5px;
-}
-
-details > div {
-  /* height: 23px; */
-}
-
-summary {
-  height: 18px;
-}
-
-summary > p {
-  display: inline-block;
+ul {
+  margin: 0 0 0 30px;
+  padding: 0 0 0 0;
+  list-style: none;
   position: relative;
-  top: -5px;
+}
+
+ul::before {
+  content: "";
+  display: block;
+  width: 0px;
+  position: absolute;
+  top: 5px;
+  bottom: 0;
+  left: 10px;
+  background: white;
+  z-index: 1;
+  border-left: 1px solid white;
+}
+
+ul.closed::before {
+  border-left: none;
+}
+
+ul > div {
+  position: relative;
+  background-color: #41403e;
+  margin-right: auto;
+  padding: 0 24px 0 24px;
+  min-width: 400px;
+  max-width: 400px;
+  z-index: 2;
+}
+
+ul > div > div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+li {
+  line-height: 14px;
   margin: 0;
-  padding-left: 25px;
+  padding: 28px 0 0 0;
+  position: relative;
+  z-index: 2;
+
+  transition: all 0.3s;
 }
 
-/* summary::before {
+li::before{
+  border-top: 1px solid;
   content: "";
+  display: block;
+  height: 100%;
+  
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 35px;
-  height: 24px;
-  background-image: url("/list-images/list-item-open.png");
-} */
-
-/* 
-details > div::before { 
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 20px;
-  height: 24px;
-  margin-right: 10px;
-  margin-top: 0px;
-  background-image: url("/list-images/list-item.png");
-  display: inline-block;
+  left: 0px;
+  top: 55px;
+  width: 30px;
+  margin-left: 11px;
 }
 
-details > div:first::before { 
-  background-image: url("/list-images/list-item-root.png");
-}
-details > div:last-of-type::before { 
-  background-image: url("/list-images/list-item-last.png");
-} */
-
-/* 
-details > div > details {
-  margin-left: 5px;
+li:last-child::before {
+  background: #41403e;
+  bottom: 0;
+  left: -1px;
+  height: auto;
+  top: 55px;
 }
 
-details > div > details[open]::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 20px;
-  height: 24px;
-  background-image: url("/list-images/list-item-open.png");
-} */
+li.closed {
+  transform: translateX(-400px) scale(0);
+  height: 0;
+  padding: 0;
+}
 
+.collabsable {
+  cursor: pointer;
+  transition: all .3s;
+}
 
-summary {list-style: none}
-summary::-webkit-details-marker {display: none; }
-summary::marker {display: none; }
+.collabsable:hover {
+  background-color: white;
+  color: black;
+}
+
+.collabsable:active {
+  transform: scale(0.9);
+}
 
 </style>
