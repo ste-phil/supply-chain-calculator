@@ -22,6 +22,15 @@ export default {
 @import "./assets/scrollbars.css";
 @import "./assets/vue-context.css";
 
+html {
+  min-height: 100vh;
+}
+
+body {
+  background: url("../public/geometry2.png") fixed;
+  min-height: 100vh;
+}
+
 .container-custom {
   padding: 0 100px 0 100px;
 }

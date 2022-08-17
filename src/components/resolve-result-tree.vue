@@ -12,7 +12,7 @@
         </div>
       </div>
 
-      <li v-for="sr in tree.subResults" :key="sr.name" :class="{closed: !visible}" ref="el" >
+      <li v-for="sr in tree.subResults" :key="sr.result.name" :class="{closed: !visible}" ref="el" >
         <!-- <div class="horizontal-line"></div> -->
         <!-- <img src="/list-images/list-item.png"/> -->
         <resolve-result-tree :tree="sr" :perSecondMode="perSecondMode" :level="level+1"></resolve-result-tree>
