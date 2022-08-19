@@ -1,5 +1,5 @@
 export default class CustomEvents {
-    public static onPress(btn: EventTarget, action: Function, delay = 1000, speedup = 1.5, minDelay = 5): void {
+    public static onPress(btn: EventTarget, action: Function, delay = 300, speedup = 1.5, minDelay = 5): void {
         let t: number;
 
         const repeat = function () {

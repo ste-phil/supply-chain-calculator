@@ -10,7 +10,7 @@ export class CalculationRequest {
     }
 
     public static fromFactories(recipe: Recipe, amount: number): CalculationRequest {
-        const aps = amount * recipe.amount / recipe.time
+        const aps = amount * recipe.outputs[0].amount / recipe.time
         return new CalculationRequest(recipe, aps);
     }
 }
@@ -61,29 +61,30 @@ export default class Calculator {
 
 
     private static resolveRequirementsTreeIntern(resourceTree: ResolveResultTree, recipe: Recipe, makeAmount: number): void {
-        const perSecond = recipe.amount / recipe.time;
+        const perSecond = recipe.outputs[0].amount / recipe.time;
         const factor = makeAmount / perSecond;
 
         resourceTree.result = new ResolveResult(recipe.name, Calculator.getBuildingCount(makeAmount, recipe), makeAmount);
         resourceTree.subResults = new Array<ResolveResultTree>(recipe.inputs.length);
 
         for (let i = 0; i < recipe.inputs.length; i++) {
-            const subRecipe = store.book.findRecipe(recipe.inputs[i].recipeName);
-            if (subRecipe == null) throw new Error("Couldn`t find input recipe with the name: " + recipe.inputs[i].recipeName + " for the recipe: " + recipe.name)
+            // const subRecipe = store.book.findRecipe(recipe.inputs[i].recipeName);
+            const subRecipes = store.book.findRecipesWithOutputRecipe(recipe.inputs[i].recipeName);
+            if (subRecipes.length == 0) throw new Error("Couldn`t find any recipes which have as output: " + recipe.inputs[i].recipeName + " for the recipe: " + recipe.name)
             
             resourceTree.subResults[i] = new ResolveResultTree();
             const requiredSubAmount = factor * recipe.inputs[i].amount / recipe.time; //required items per second
 
             Calculator.resolveRequirementsTreeIntern(
                 resourceTree.subResults[i],
-                subRecipe,
+                subRecipes[0],
                 requiredSubAmount
             );
         }
     }
 
     private static resolveRequirementsIntern(requiredResourcesDict: any, recipe: Recipe, makeAmount: number): void {
-        const perSecond = recipe.amount / recipe.time;
+        const perSecond = recipe.outputs[0].amount / recipe.time;
         const factor = makeAmount / perSecond;
 
         for (let i = 0; i < recipe.inputs.length; i++) {
@@ -123,6 +124,6 @@ export default class Calculator {
     }
 
     private static getBuildingCount(perSecond: number, recipe: Recipe): number {
-        return perSecond * recipe.time / recipe.amount;
+        return perSecond * recipe.time / recipe.outputs[0].amount;
     }
 }

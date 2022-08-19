@@ -23,15 +23,10 @@ export class RecipeBook {
         else if (mode == "extend") this.recipes.push(importedRecipes);
     }
 
-    addRecipe(name: string, time: number, amount: number, inputs: RecipeInput[]) {
+    addRecipe(name: string, time: number, amount: number, outputs: RecipeInput[], inputs: RecipeInput[]) {
         if (this.recipeNameExists(name)) return;
 
-        this.recipes.splice(0, 0, {
-            name, 
-            time, 
-            amount, 
-            inputs
-        });
+        this.recipes.splice(0, 0, Recipe.CreateMultipleOutput(name, time, amount, outputs, inputs));
     }
 
     updateRecipe(oldRecipe: Recipe, name: string, time: number, amount: number, inputs: RecipeInput[]) {
@@ -40,7 +35,7 @@ export class RecipeBook {
         const i = this.recipes.indexOf(oldRecipe)
         this.recipes[i].name = name;
         this.recipes[i].time = time;
-        this.recipes[i].amount = amount;
+        // this.recipes[i].amount = amount;
         this.recipes[i].inputs = inputs;
     }
 
@@ -48,10 +43,31 @@ export class RecipeBook {
         return this.recipes;
     }
 
+    getRecipeOutputs(): RecipeInput[] {
+        const recipeOuts = new Array<RecipeInput>();
+        
+        for (let i = 0; i < this.recipes.length; i++) {
+            for (let j = 0; j < this.recipes[i].outputs.length; j++) {
+                const recipeInOut = this.recipes[i].outputs[j];
+
+                if (recipeOuts.filter(x => x.recipeName == recipeInOut.recipeName).length == 0) {
+                    recipeOuts.push(this.recipes[i].outputs[j])
+                }
+            }
+        }
+        
+
+        return recipeOuts;
+    }
+
     findRecipe(name: string): Recipe | null {
         const filtered = this.recipes.filter(x => x.name == name);
         if (filtered.length > 0) return filtered[0]; 
         return null;
+    }
+
+    findRecipesWithOutputRecipe(name: string): Recipe[] {
+        return this.recipes.filter(x => x.outputs.filter(x => x.recipeName == name).length > 0)
     }
 
     recipeNameExists(name: string): boolean {

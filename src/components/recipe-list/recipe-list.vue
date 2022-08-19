@@ -6,7 +6,7 @@
         <div v-if="!vr.editMode" :key="vr.recipe.name" class="card">
             <div class="card-body">
                 <h4 class="card-title">{{vr.recipe.name}}</h4>
-                <h5 class="card-subtitle"><strong>{{vr.recipe.amount}}x</strong> in <strong>{{vr.recipe.time}}</strong> seconds</h5>
+                <h5 class="card-subtitle"><strong>{{vr.recipe.outputs[0].amount}}x</strong> in <strong>{{vr.recipe.time}}</strong> seconds</h5>
 
                 <div v-if="vr.recipe.inputs.length > 0" class="collapsible">
                     <input :id="'collapsible' + vr.recipe.name" type="checkbox" name="collapsible">

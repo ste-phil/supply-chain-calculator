@@ -1,7 +1,6 @@
 <template>
-  <ul :class="{closed: !visible}">
+  <ul :class="{closed: !visible}" v-if="tree.subResults != null">
       <div class="border border-primary" @click="visible = !visible; " :class="{collabsable: tree.subResults.length > 0}">
-        <!-- <img v-for="l in level+1" :key="l" src="/list-images/list-item.png"/> -->
         <div v-if="perSecondMode"> 
           <p>{{ tree.result.name }}</p>
           <p><strong>{{ Math.round(tree.result.perSecond * 100) / 100 }}</strong>/s</p>
@@ -13,8 +12,6 @@
       </div>
 
       <li v-for="sr in tree.subResults" :key="sr.result.name" :class="{closed: !visible}" ref="el" >
-        <!-- <div class="horizontal-line"></div> -->
-        <!-- <img src="/list-images/list-item.png"/> -->
         <resolve-result-tree :tree="sr" :perSecondMode="perSecondMode" :level="level+1"></resolve-result-tree>
       </li>
   </ul>

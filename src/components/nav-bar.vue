@@ -1,12 +1,12 @@
 <template>
     <div class="nav-bar" :class="{active: isActive}">
         <div class="pie pie1" >
-            <a class="pie-color" @click="changeRoute('/library')" href="#/library">
+            <a class="pie-color" @click="changeRoute('Library')">
                 <span class="material-icons">folder</span>
             </a>
         </div>
         <div class="pie pie2">
-            <a class="pie-color" @click="changeRoute('/')" href="#/">
+            <a class="pie-color" @click="changeRoute('Home')">
                 <span class="material-icons">calculate</span>
             </a>
         </div>

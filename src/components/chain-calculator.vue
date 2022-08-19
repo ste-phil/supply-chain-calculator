@@ -23,18 +23,31 @@
     </tr>
   </table>
 
-  <div v-if="listMode"> 
-    <div v-if="itemsPerSecondsMode">
-      <p v-for="result in resultList" :key="result.name">
-      {{ result.name }}: <strong>{{ Math.round(result.perSecond * 100) / 100 }}</strong>/s
-      </p>
-    </div>
-    <div v-if="!itemsPerSecondsMode">
-      <p v-for="result in resultList" :key="result.name">
-        {{ result.name }}: <strong>{{ Math.round(result.amountFactories * 100) / 100 }}</strong> Factories
-      </p>
-    </div>
-  </div>
+  <table v-if="listMode"> 
+    <tbody v-if="itemsPerSecondsMode">
+       <tr v-for="result in resultList" :key="result.name">
+        <td >
+          {{ result.name }}
+        </td>
+        <td>
+          <strong>{{ Math.round(result.perSecond * 100) / 100 }}</strong> /s
+        </td>
+      </tr>
+      
+    </tbody>
+
+    <tbody v-if="!itemsPerSecondsMode">
+      <tr v-for="result in resultList" :key="result.name">
+        <td>
+          {{ result.name }}
+        </td>
+        <td>
+          <strong>{{ Math.round(result.amountFactories * 100) / 100 }}</strong> Factories
+        </td>
+      </tr>
+      
+    </tbody>
+  </table>
 
   <div v-if="!listMode"> 
     <resolve-result-tree-component :tree="resultTree" :perSecondMode="itemsPerSecondsMode" :level="0"></resolve-result-tree-component>

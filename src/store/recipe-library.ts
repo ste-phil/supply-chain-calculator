@@ -5,12 +5,12 @@ import { LocalStorageWorker } from "./storage-helper";
 const defaultBookName = "default";
 const defaultBookDescription = "default description";
 const defaultRecipes: Recipe[] = new Array<Recipe>(
-    new Recipe("Iron Ore", 1, 1),
-    new Recipe("Iron Plate", 3.2, 1, new RecipeInput(1, "Iron Ore")),
-    new Recipe("Copper Ore", 1, 1),
-    new Recipe("Copper Plate", 3.2, 1, new RecipeInput(1, "Copper Ore")),
-    new Recipe("Gears", 0.5, 1, new RecipeInput(1, "Iron Plate")),
-    new Recipe("Red Science", 5, 1, new RecipeInput(1, "Gears"), new RecipeInput(1, "Copper Plate"))
+    Recipe.CreateSingleOutput("Iron Ore", 1, 1),
+    Recipe.CreateSingleOutput("Iron Plate", 3.2, 1, new RecipeInput(1, "Iron Ore")),
+    Recipe.CreateSingleOutput("Copper Ore", 1, 1),
+    Recipe.CreateSingleOutput("Copper Plate", 3.2, 1, new RecipeInput(1, "Copper Ore")),
+    Recipe.CreateSingleOutput("Gears", 0.5, 1, new RecipeInput(1, "Iron Plate")),
+    Recipe.CreateSingleOutput("Red Science", 5, 1, new RecipeInput(1, "Gears"), new RecipeInput(1, "Copper Plate"))
 );
 
 export class RecipeLibrary {
@@ -121,8 +121,14 @@ export class RecipeLibrary {
 
     importBook(bookString: string): string | null {
         try {
-            const book = JSON.parse(bookString) as RecipeBook;
+            const book = JSON.parse(bookString) as any;
             const bookName = book.name + "_Import";
+
+            book.recipes.forEach((x: any) => {
+                x.outputs = []
+                x.outputs.push(new RecipeInput(x.amount, x.name));
+                delete x.amount
+            });
 
             if (book.name != null && book.desc != null && book.recipes != null) {
                 this.addBook(bookName, book.desc, book.recipes);
