@@ -124,12 +124,6 @@ export class RecipeLibrary {
             const book = JSON.parse(bookString) as any;
             const bookName = book.name + "_Import";
 
-            book.recipes.forEach((x: any) => {
-                x.outputs = []
-                x.outputs.push(new RecipeInput(x.amount, x.name));
-                delete x.amount
-            });
-
             if (book.name != null && book.desc != null && book.recipes != null) {
                 this.addBook(bookName, book.desc, book.recipes);
                 return bookName;
