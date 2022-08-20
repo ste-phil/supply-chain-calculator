@@ -83,4 +83,8 @@ body {
   padding: 0.15rem .5rem .5rem .5rem;
 }
 
+.collapsible .collapsible-body {
+  transition: all 0.2s;
+}
+
 </style>

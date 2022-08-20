@@ -1,5 +1,5 @@
 <template>
-  <div class="card" style="width: 100%; margin:10px 0 10px 0;">
+  <div class="card">
     <div class="card-body">
       <input readonly class="disabled" v-model="recipe.name" style="margin: 0 0 5px 0; width: 100%;" placeholder="Name"/>
       <input v-model="recipe.time" style="margin: 0 0 5px 0; width: 100%;" placeholder="Time (seconds)" type="number"/>
@@ -9,7 +9,7 @@
         <input @keyup="onKeyUpRecipeIn" v-model="selectedInput" placeholder="Select Inputs" list="recipes-create" style="margin: 0 0 5px 0; width: calc(100% - 35px); float:left;">
         <button @click="addSelectedInput" class="btn-small" style="float:left; font-size:19px; ">+</button>
         <datalist id="recipes-create" >
-            <option v-for="recipe in store.book.getRecipes()" :key="recipe.name" :value="recipe.name" :data-id="recipe.name"></option>
+            <option v-for="recipe in store.book.getRecipeOutputs()" :key="recipe.recipeName" :value="recipe.recipeName" :data-id="recipe.recipeName"></option>
         </datalist>
       </div>
       <div v-if="recipe.inputs.length > 0" style="float:none;width:100%;">
@@ -38,7 +38,7 @@
         <input v-model="amount" style="margin: 0 0 5px 0; width: 100%;" placeholder="Output (amount)" type="number"/>
       </div>
 
-      <div v-if="recipe.outputs.length > 0" style="float:none;width:100%;">
+      <div v-if="recipe.outputs.length > 1 || hasMultipleOutputs" style="float:none;width:100%;">
         <label class="header-border">Outputs</label>
         <div style="padding: 10px; background-color:var(--white-dark-light-80)">
             <ingredient-list-item v-for="ingredient in recipe.outputs" :key="ingredient.recipeName" 

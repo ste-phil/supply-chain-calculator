@@ -31,7 +31,7 @@ export class Recipe {
         this.outputs = outputs;
     }
 
-    public static CreateMultipleOutput(name: string, time: number, amount: number, outputs: RecipeInput[], inputs: RecipeInput[]): Recipe
+    public static CreateMultipleOutput(name: string, time: number, outputs: RecipeInput[], inputs: RecipeInput[]): Recipe
     {
         return new Recipe(
             name,

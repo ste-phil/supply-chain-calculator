@@ -25,8 +25,13 @@ export class RecipeBook {
 
     addRecipe(name: string, time: number, amount: number, outputs: RecipeInput[], inputs: RecipeInput[]) {
         if (this.recipeNameExists(name)) return;
-
-        this.recipes.splice(0, 0, Recipe.CreateMultipleOutput(name, time, amount, outputs, inputs));
+        if (outputs.length == 0 && amount > 0) {
+            this.recipes.splice(0, 0, Recipe.CreateSingleOutput(name, time, amount, ...inputs));
+            return;
+        }
+        else {
+            this.recipes.splice(0, 0, Recipe.CreateMultipleOutput(name, time, outputs, inputs));
+        }
     }
 
     updateRecipe(oldRecipe: Recipe, name: string, time: number, amount: number, inputs: RecipeInput[]) {
